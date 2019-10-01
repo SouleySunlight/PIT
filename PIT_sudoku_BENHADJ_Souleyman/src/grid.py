@@ -20,7 +20,13 @@ class SudokuGrid:
         :return: La grille de Sudoku correspondant à la ligne donnée dans le fichier donné
         :rtype: SudokuGrid
         """
-        raise NotImplementedError()
+        fichier= open("filename","r")
+        for i in range(line):
+            ligne = fichier.readline()
+        fichier.close()
+        return cls(ligne)
+
+
 
     @classmethod
     def from_stdin(cls):
@@ -31,7 +37,8 @@ class SudokuGrid:
         :return: La grille de Sudoku correspondant à la ligne donnée par l'utilisateur
         :rtype: SudokuGrid
         """
-        raise NotImplementedError()
+        ligne = input(" Saisissez une suite de caractere de nombre entre 0 et 9 comprenant 81 caractere")
+        return cls(ligne)
 
     def __init__(self, initial_values_str):
         """À COMPLÉTER!
@@ -42,6 +49,16 @@ class SudokuGrid:
             où ``0`` indique une case vide
         :type initial_values_str: str
         """
+        self.tab= [[0]*9]*9
+        for i in initial_values_str:
+          i=int(i)  
+            try:
+                assert len(initial_values_str)==81 and i>=0 and i<=9
+                self.tab[i%9][i//9]=i
+            except AssertionError : 
+                print("La chaine n'est pas valide")
+
+
 
     def __str__(self):
         """À COMPLÉTER!
@@ -49,6 +66,7 @@ class SudokuGrid:
         :return: Une chaîne de caractère (sur plusieurs lignes...) représentant la grille
         :rtype: str
         """
+
         raise NotImplementedError()
 
     def get_row(self, i):
@@ -60,7 +78,15 @@ class SudokuGrid:
         :return: La liste des valeurs présentes à la ligne donnée
         :rtype: list of int
         """
-        raise NotImplementedError()
+        try : 
+            assert i>=0 and i<9
+            ligne = self.tab[i]
+        except TypeError:
+            print("Le numero de ligne doit etre un entier")
+        except AssertionError:
+            print("La valeur de la ligne est incorrecte")
+        return ligne
+
 
     def get_col(self, j):
         """À COMPLÉTER!
@@ -71,7 +97,17 @@ class SudokuGrid:
         :return: La liste des valeurs présentes à la colonne donnée
         :rtype: list of int
         """
-        raise NotImplementedError()
+        colonne = [0,0,0,0,0,0,0,0,0]
+        try :
+            assert j>=0 and j<9
+            for i in range(9):
+                colonne[i]=self.tab[i][j]
+        except TypeError : 
+            print("Le numero de ligne doit etre un entier")
+        except AssertionError:
+            print("La valeur de la colonne est incorrecte")
+        return colonne
+
 
     def get_region(self, reg_row, reg_col):
         """À COMPLÉTER!
@@ -84,7 +120,19 @@ class SudokuGrid:
         :return: La liste des valeurs présentes à la colonne donnée
         :rtype: list of int
         """
-        raise NotImplementedError()
+        a=0
+        zone = [0,0,0,0,0,0,0,0,0]
+        try : 
+            assert reg_row>=0 and reg_row<=2 and reg_col>=0 and reg_col<=2
+            for i in range(3) : 
+                for j in range(3):
+                    zone[a]=self.tab[2*reg_row + i][2*reg_col + j]
+                    a=a+1
+        except TypeError:
+                print("Les coordonnees doivent etre des entiers")
+        except AssertionError:
+                print("Les coordonees doivent etre comprises entre 0 et 2")
+        return zone      
 
     def get_empty_pos(self):
         """À COMPLÉTER!
