@@ -1,4 +1,6 @@
 #-*-coding: utf8-*-
+from grid import SudokuGrid
+
 
 class SudokuSolver:
     """Cette classe permet d'explorer les solutions d'une grille de Sudoku pour la résoudre.
@@ -8,12 +10,17 @@ class SudokuSolver:
     def __init__(self, grid):
         """À COMPLÉTER
         Ce constructeur initialise une nouvelle instance de solver à partir d'une grille initiale.
-        Il construit les ensembles de valeurs possibles pour chaque case vide de la grille,
+        Il construett les ensembles de valeurs possibles pour chaque case vide de la grille,
         en respectant les contraintes définissant un Sudoku valide.
         :param grid: Une grille de Sudoku
         :type grid: SudokuGrid
         """
-        raise NotImplementedError()
+        self.grid=grid
+        self.dico={}
+        for i in grid.get_empty_pos():
+            liste=[1,2,3,4,5,6,7,8,9]
+            self.dico[i]=liste
+
 
     def is_valid(self):
         """À COMPLÉTER
@@ -22,7 +29,12 @@ class SudokuSolver:
         :return: Un booléen indiquant si la solution partielle actuelle peut encore mener à une solution valide
         :rtype: bool
         """
-        raise NotImplementedError()
+        ok = True
+        liste=self.grid.get_empty_pos()
+        for i in liste : 
+            if self.dico[i]==True:
+                ok=False
+        return ok
 
     def is_solved(self):
         """À COMPLÉTER
@@ -31,7 +43,11 @@ class SudokuSolver:
         :return: Un booléen indiquant si la solution actuelle est complète.
         :rtype: bool
         """
-        raise NotImplementedError()
+        fini=True
+        for i in self.dico.values():
+            if not i==True:
+                fini=False
+        return fini
 
     def reduce_all_domains(self):
         """À COMPLÉTER
@@ -39,7 +55,18 @@ class SudokuSolver:
         et élimine toutes les valeurs impossibles pour chaque case vide.
         *Indication: Vous pouvez utiliser les fonction ``get_row``, ``get_col`` et ``get_region`` de la grille*
         """
-        raise NotImplementedError()
+        for i, j in self.dico.items():
+            for a in self.grid.get_row(i[0]):
+                if a in j:
+                    j.remove(a)
+            for b in self.grid.get_col(i[1]):
+                colonne= self.grid.get_col(i[1])
+                if b in j:
+                    j.remove(b)
+            for c in self.grid.get_region(i[0]//3,i[1]//3):
+                zone=self.grid.get_region(i[0]//3,i[1]//3)
+                if c in j:
+                    j.remove(c)
 
     def reduce_domains(self, last_i, last_j, last_v):
         """À COMPLÉTER
@@ -53,7 +80,20 @@ class SudokuSolver:
         :type last_j: int
         :type last_v: int
         """
-        raise NotImplementedError()
+        for i,j in self.dico.items():
+            if i[0]==last_i:
+                if last_v in j:
+                    j.remove(last_v)
+            if i[1]==last_j:
+                if last_v in j:
+                    j.remove(last_v)
+            if last_i//3==i[0]//3 and last_j//3==i[1]//3:
+                if last_v in j:
+                     j .remove(last_v)
+
+
+
+	
 
     def commit_one_var(self):
         """À COMPLÉTER
@@ -64,7 +104,18 @@ class SudokuSolver:
         ou ``None`` si aucune case n'a pu être remplie.
         :rtype: tuple of int or None
         """
-        raise NotImplementedError()
+        t=None
+        for i,j in self.dico.items():
+            if len(j)==1:
+                self.grid.write([i[0]],[i[1]],[j[0]])
+                t=(i[0],i[1],j[0])
+                del j[0]
+                break
+        return t 
+
+
+
+
 
     def solve_step(self):
         """À COMPLÉTER
@@ -76,7 +127,14 @@ class SudokuSolver:
         il est aussi possible de vérifier s'il ne reste plus qu'une seule position valide pour une certaine valeur
         sur chaque ligne, chaque colonne et dans chaque région*
         """
-        raise NotImplementedError()
+        self.reduce_all_domains()
+        print(self.commit_one_var())
+        while self.commit_one_var()!=None:
+            t=self.commit_one_var()
+            self.reduce_domains(t[0],t[1],t[2])
+            print(self.grid)
+
+
 
     def branch(self):
         """À COMPLÉTER
