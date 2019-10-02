@@ -20,11 +20,11 @@ class SudokuGrid:
         :return: La grille de Sudoku correspondant à la ligne donnée dans le fichier donné
         :rtype: SudokuGrid
         """
-        fichier= open("filename","r")
+        fichier= open(filename,"r")
         for i in range(line):
-            ligne = fichier.readline()
+            content = fichier.readline().strip('\n')
         fichier.close()
-        return cls(ligne)
+        return cls(content)
 
 
 
@@ -37,7 +37,7 @@ class SudokuGrid:
         :return: La grille de Sudoku correspondant à la ligne donnée par l'utilisateur
         :rtype: SudokuGrid
         """
-        ligne = input(" Saisissez une suite de caractere de nombre entre 0 et 9 comprenant 81 caractere")
+        ligne = input(" Saisissez une suite de caractere de nombrentre 0 et 9 comprenant 81 caractere")
         return cls(ligne)
 
     def __init__(self, initial_values_str):
@@ -49,12 +49,16 @@ class SudokuGrid:
             où ``0`` indique une case vide
         :type initial_values_str: str
         """
-        self.tab= [[0]*9]*9
+        a=0
+        self.tab= [[0 for x in range(9)] for i in range(9)]
+        if len(initial_values_str)!=81:
+            raise ValueError("La chaine ne fait pas 81 caracteres")
         for i in initial_values_str:
-          i=int(i)  
-            try:
-                assert len(initial_values_str)==81 and i>=0 and i<=9
-                self.tab[i%9][i//9]=i
+            i=int(i)
+            try :
+                assert  i>=0 and i<=9
+                self.tab[a%9][a//9]=int(i)
+                a=a+1
             except AssertionError : 
                 print("La chaine n'est pas valide")
 
@@ -66,8 +70,15 @@ class SudokuGrid:
         :return: Une chaîne de caractère (sur plusieurs lignes...) représentant la grille
         :rtype: str
         """
+        affichage =""
+        for i in range(9):
+            affichage = affichage+ "\n"
+            for j in range(9):
+                affichage = affichage + str(self.tab[j][i])+" "
+        return affichage
 
-        raise NotImplementedError()
+
+
 
     def get_row(self, i):
         """À COMPLÉTER!
@@ -78,9 +89,11 @@ class SudokuGrid:
         :return: La liste des valeurs présentes à la ligne donnée
         :rtype: list of int
         """
+        ligne= [0,0,0,0,0,0,0,0,0]
         try : 
             assert i>=0 and i<9
-            ligne = self.tab[i]
+            for x in range(9):
+                ligne[x] = self.tab[x][i]
         except TypeError:
             print("Le numero de ligne doit etre un entier")
         except AssertionError:
@@ -101,7 +114,7 @@ class SudokuGrid:
         try :
             assert j>=0 and j<9
             for i in range(9):
-                colonne[i]=self.tab[i][j]
+                colonne[i]=self.tab[j][i]
         except TypeError : 
             print("Le numero de ligne doit etre un entier")
         except AssertionError:
@@ -126,7 +139,7 @@ class SudokuGrid:
             assert reg_row>=0 and reg_row<=2 and reg_col>=0 and reg_col<=2
             for i in range(3) : 
                 for j in range(3):
-                    zone[a]=self.tab[2*reg_row + i][2*reg_col + j]
+                    zone[a]=self.tab[3*reg_col + j][3*reg_row + i]
                     a=a+1
         except TypeError:
                 print("Les coordonnees doivent etre des entiers")
@@ -142,7 +155,14 @@ class SudokuGrid:
         :return: La liste des valeurs présentes à la colonne donnée
         :rtype: list of tuple of int
         """
-        raise NotImplementedError()
+        t=(0,0)
+        liste=[]
+        for i in range(9):
+            for j in range(9):
+                if self.tab[j][i]==0:
+                    t=(i,j)
+                    liste.append(t)
+        return liste
 
     def write(self, i, j, v):
         """À COMPLÉTER!
@@ -155,7 +175,11 @@ class SudokuGrid:
         :param j: Numéro de colonne de la case à mettre à jour, entre 0 et 8
         :param v: Valeur à écrire dans la case ``(i,j)``, entre 1 et 9
         """
-        raise NotImplementedError()
+        if v<=0 and v>9 and i<0 and i>8 and j<0 and j>8:
+            raise ValueError("Valeur(s) incorrecte(s)")
+        else: 
+            self.tab[j][i]=v
+
 
     def copy(self):
         """À COMPLÉTER!
@@ -165,4 +189,9 @@ class SudokuGrid:
         *Variante avancée: vous pouvez aussi utiliser ``self.__new__(self.__class__)``
         et manuellement initialiser les attributs de la copie.*
         """
-        raise NotImplementedError()
+        liste=""
+        for i in range(9) :
+            for j in range(9) :
+                liste=liste+str(self.tab[j][i])
+        new_grille=SudokuGrid(liste)
+        return new_grille
