@@ -32,7 +32,7 @@ class SudokuSolver:
         ok = True
         liste=self.grid.get_empty_pos()
         for i in liste : 
-            if self.dico[i]==True:
+            if not self.dico[i]:
                 ok=False
         return ok
 
@@ -133,7 +133,6 @@ class SudokuSolver:
         while type(t) is tuple:
             self.reduce_domains(t[0],t[1],t[2])
             t=self.commit_one_var()
-        print(self.grid)
 
 
 
@@ -151,7 +150,7 @@ class SudokuSolver:
         :rtype: list of SudokuSolver
         """
         b=10
-        c=(0,0)
+        c=(8,8)
         branch=[]
         for x,y in self.dico.items():
             if len(y)>0 and len(y)<b:
@@ -180,12 +179,30 @@ class SudokuSolver:
         (ou None si pas de solution)
         :rtype: SudokuGrid or None
         """
-        self.solve_step()
-        if self.is_solved():
-            return self.grid
-        if self.is_valid() == False:
-            return None
-        
+        branche= [self.grid]
+        for i in branche:
+                self.grid=i
+                print(type(self.commit_one_var()))
+                while self.is_valid():
+                    if type(self.commit_one_var()) is not tuple:
+                        break
+                    self.solve_step()
+                    if self.is_solved():
+                        return i
+                    if self.is_valid():
+                        branche.extend(self.branch())
+                        print(self.is_valid())
+                        print(self.dico)
+                        print(len(branche))
+                        break
+                    
+                    
+                   
+                
+
+                    
+                    
+                    
             
         
        
