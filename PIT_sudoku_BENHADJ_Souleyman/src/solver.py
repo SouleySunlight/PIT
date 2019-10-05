@@ -128,11 +128,12 @@ class SudokuSolver:
         sur chaque ligne, chaque colonne et dans chaque région*
         """
         self.reduce_all_domains()
-        print(self.commit_one_var())
-        while self.commit_one_var()!=None:
-            t=self.commit_one_var()
+        t=self.commit_one_var()
+        print(self.grid)
+        while type(t) is tuple:
             self.reduce_domains(t[0],t[1],t[2])
-            print(self.grid)
+            t=self.commit_one_var()
+        print(self.grid)
 
 
 
@@ -149,9 +150,24 @@ class SudokuSolver:
         :return: Une liste de sous-problèmes ayant chacun une valeur différente pour la variable choisie
         :rtype: list of SudokuSolver
         """
-        raise NotImplementedError()
+        b=10
+        c=(0,0)
+        branch=[]
+        for x,y in self.dico.items():
+            if len(y)>0 and len(y)<b:
+                c=x
+                b=len(y)
+        for i in self.dico[c]:
+            grille=self.grid.copy()
+            grille.write(c[0],c[1],i)
+            branch.append(grille)
+        return branch
+                
+                    
+        
 
     def solve(self):
+        
         """
         Cette méthode implémente la fonction principale de la programmation par contrainte.
         Elle cherche d'abord à affiner au mieux la solution partielle actuelle par un appel à ``solve_step``.
@@ -164,4 +180,12 @@ class SudokuSolver:
         (ou None si pas de solution)
         :rtype: SudokuGrid or None
         """
-        raise NotImplementedError()
+        self.solve_step()
+        if self.is_solved():
+            return self.grid
+        if self.is_valid() == False:
+            return None
+        
+            
+        
+       

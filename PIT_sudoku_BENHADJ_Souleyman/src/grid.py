@@ -175,6 +175,12 @@ class SudokuGrid:
         :param j: Numéro de colonne de la case à mettre à jour, entre 0 et 8
         :param v: Valeur à écrire dans la case ``(i,j)``, entre 1 et 9
         """
+        if type(v) is list:
+            v=v[0]
+        if type(i) is list:
+            i=i[0]
+        if type(j) is list:
+            j=j[0]
         if v<=0 and v>9 and i<0 and i>8 and j<0 and j>8:
             raise ValueError("Valeur(s) incorrecte(s)")
         else: 
