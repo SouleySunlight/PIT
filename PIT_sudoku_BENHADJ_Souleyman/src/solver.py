@@ -129,7 +129,6 @@ class SudokuSolver:
         """
         self.reduce_all_domains()
         t=self.commit_one_var()
-        print(self.grid)
         while type(t) is tuple:
             self.reduce_domains(t[0],t[1],t[2])
             t=self.commit_one_var()
@@ -149,13 +148,13 @@ class SudokuSolver:
         :return: Une liste de sous-problèmes ayant chacun une valeur différente pour la variable choisie
         :rtype: list of SudokuSolver
         """
-        b=10
-        c=(8,8)
+        c=0
         branch=[]
         for x,y in self.dico.items():
-            if len(y)>0 and len(y)<b:
+            if len(y)>=2:
                 c=x
                 b=len(y)
+                break
         for i in self.dico[c]:
             grille=self.grid.copy()
             grille.write(c[0],c[1],i)
@@ -167,8 +166,7 @@ class SudokuSolver:
 
     def solve(self):
         
-        """
-        Cette méthode implémente la fonction principale de la programmation par contrainte.
+        """        Cette méthode implémente la fonction principale de la programmation par contrainte.
         Elle cherche d'abord à affiner au mieux la solution partielle actuelle par un appel à ``solve_step``.
         Si la solution est complète, elle la retourne.
         Si elle est invalide, elle renvoie ``None`` pour indiquer un cul-de-sac dans la recherche de solution
@@ -179,28 +177,27 @@ class SudokuSolver:
         (ou None si pas de solution)
         :rtype: SudokuGrid or None
         """
-        branche= [self.grid]
-        for i in branche:
+        while self.is_solved()==False:
+            self.solve_step()
+            print(self.grid)
+            print("********************************")
+            print(self.dico)
+            branche=self.branch()
+            for i in branche:
                 self.grid=i
-                print(type(self.commit_one_var()))
-                while self.is_valid():
-                    if type(self.commit_one_var()) is not tuple:
-                        break
-                    self.solve_step()
-                    if self.is_solved():
-                        return i
-                    if self.is_valid():
-                        branche.extend(self.branch())
-                        print(self.is_valid())
-                        print(self.dico)
-                        print(len(branche))
-                        break
-                    
-                    
-                   
-                
+                print(self.grid)
+                print(self.is_valid)
+                self.solve()
+                """if self.is_valid():
+                    print("test")
+                    break"""
 
-                    
+        
+        return self.grid
+                
+        
+
+
                     
                     
             
