@@ -109,7 +109,7 @@ class SudokuSolver:
             if len(j)==1:
                 self.grid.write([i[0]],[i[1]],[j[0]])
                 t=(i[0],i[1],j[0])
-                del j[0]
+                del self.dico[i]
                 break
         return t 
 
@@ -157,8 +157,12 @@ class SudokuSolver:
                 break
         for i in self.dico[c]:
             grille=self.grid.copy()
-            grille.write(c[0],c[1],i)
-            branch.append(grille)
+            s=SudokuSolver(grille)
+            s.reduce_all_domains()
+            s.grid.write(c[0],c[1],i)
+            s.reduce_domains(c[0],c[1],i)
+            del s.dico[c]
+            branch.append(s)
         return branch
                 
                     
@@ -177,29 +181,19 @@ class SudokuSolver:
         (ou None si pas de solution)
         :rtype: SudokuGrid or None
         """
-        while self.is_solved()==False:
-            self.solve_step()
-            print(self.grid)
-            print("********************************")
-            print(self.dico)
-            branche=self.branch()
-            for i in branche:
-                self.grid=i
-                print(self.grid)
-                print(self.is_valid)
-                self.solve()
-                """if self.is_valid():
-                    print("test")
-                    break"""
-
-        
-        return self.grid
-                
-        
-
-
-                    
-                    
+        branche=[self]
+        for i in branche:
+            i.solve_step()
+            print(i.grid)
+            print(i.dico)
+            if i.is_solved():
+                return i.grid
+            x=i.branch()
+            for a in x:
+                a.solve_step()
+                if a.is_valid():
+                    branche.append(a)
             
-        
-       
+                
+                
+
